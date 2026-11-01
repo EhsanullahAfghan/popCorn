@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { use, useEffect, useState } from "react";
 import StarRating from "./StarRating";
 
 const tempMovieData = [
@@ -57,7 +57,7 @@ export default function Appv1() {
   const [movies, setMovies] = useState([]);
   const [selectedId, setSelectedId] = useState(null);
   const [query, setQuery] = useState("");
-  const [watched, setWatched] = useState(tempWatchedData);
+  const [watched, setWatched] = useState([]);
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState("");
 
@@ -67,6 +67,10 @@ export default function Appv1() {
 
   function CloseSelectedId() {
     setSelectedId(null);
+  }
+
+  function handleAddwatched(movie) {
+    setWatched((watched) => [...watched, movie]);
   }
 
   useEffect(() => {
@@ -126,6 +130,7 @@ export default function Appv1() {
             <MovieDetails
               selectedId={selectedId}
               CloseSelectedId={CloseSelectedId}
+              onAddWatched={handleAddwatched}
             />
           ) : (
             <>
@@ -274,8 +279,8 @@ function WatchMovieList({ watched }) {
 function WatchMovie({ movie }) {
   return (
     <li key={movie.imdbID}>
-      <img src={movie.Poster} alt={`${movie.Title} poster`} />
-      <h3>{movie.Title}</h3>
+      <img src={movie.poster} alt={`${movie.Title} poster`} />
+      <h3>{movie.title}</h3>
       <div>
         <p>
           <span>⭐️</span>
@@ -294,7 +299,7 @@ function WatchMovie({ movie }) {
   );
 }
 
-function MovieDetails({ selectedId, CloseSelectedId }) {
+function MovieDetails({ selectedId, CloseSelectedId, onAddWatched }) {
   const [movie, setMovie] = useState({});
   const [loading, setLoading] = useState(false);
 
@@ -340,6 +345,28 @@ function MovieDetails({ selectedId, CloseSelectedId }) {
     [selectedId],
   );
 
+  useEffect(
+    function () {
+      if (!title) return;
+      document.title = `Movie | ${title}`;
+    },
+    [title],
+  );
+
+  function handleAdd() {
+    const newMovie = {
+      imdbID: selectedId,
+      poster,
+      title,
+      imdbRating: Number(imdbRating),
+      year,
+      runtime: Number(runtime.split(" ").at(0)),
+    };
+
+    onAddWatched(newMovie);
+    CloseSelectedId(null);
+  }
+
   return loading ? (
     <Loadings />
   ) : (
@@ -365,6 +392,9 @@ function MovieDetails({ selectedId, CloseSelectedId }) {
       <section>
         <div className="rating">
           <StarRating maxRating={10} size={24} />
+          <button className="btn-add" onClick={handleAdd}>
+            + Add to list
+          </button>
         </div>
 
         <p>
