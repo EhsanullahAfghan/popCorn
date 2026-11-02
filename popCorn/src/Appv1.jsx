@@ -92,6 +92,7 @@ export default function Appv1() {
         if (data.Response === "False") throw new Error("Movie Not Found !");
 
         setMovies(data.Search);
+        setErrors("");
       } catch (err) {
         if (err.name !== "AbortError") {
           setErrors(err.message);
@@ -363,6 +364,23 @@ function MovieDetails({ selectedId, CloseSelectedId, onAddWatched }) {
       };
     },
     [title],
+  );
+
+  useEffect(
+    function () {
+      function callback(e) {
+        if (e.code === "Escape") {
+          CloseSelectedId(null);
+          console.log("CHECKING");
+        }
+      }
+      document.addEventListener("keydown", callback);
+
+      return function () {
+        document.removeEventListener("keydown", callback);
+      };
+    },
+    [CloseSelectedId],
   );
 
   function handleAdd() {
