@@ -183,12 +183,22 @@ function Logo() {
 }
 
 function Search({ query, setQuery }) {
-  const inputs = useRef(null);
+  const inputBox = useRef(null);
 
-  function handleInputs() {
-    inputs.current.focus();
-    console.log("Wohoo Bro.");
-  }
+  useEffect(
+    function (e) {
+      function handleInput() {
+        if (inputBox.current.value.length > 0) {
+          inputBox.current.style.border = "2px solid red";
+        } else {
+          inputBox.current.style.border = "";
+        }
+      }
+
+      handleInput(e);
+    },
+    [query],
+  );
 
   return (
     <input
@@ -197,8 +207,7 @@ function Search({ query, setQuery }) {
       placeholder="Search movies..."
       value={query}
       onChange={(e) => setQuery(e.target.value)}
-      ref={inputs}
-      onClick={handleInputs}
+      ref={inputBox}
     />
   );
 }
